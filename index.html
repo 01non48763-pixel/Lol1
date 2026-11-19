@@ -29,8 +29,12 @@
     .btn-copiar { margin-top: 8px; padding: 7px 12px; border: none; border-radius: 8px; background: #047857; color: #fff; font-size: 12px; font-weight: bold; cursor: pointer; }
     .btn-enviar { width: 100%; margin-top: 16px; padding: 12px; border: none; border-radius: 10px; background: #047857; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; }
     .btn-enviar:active { background: #064e3b; }
-    .msg-ok { margin-top: 12px; padding: 12px; border-radius: 8px; background: #dcfce7; color: #14532d; font-size: 13px; font-weight: bold; display: none; }
     .msg-err { margin-top: 12px; padding: 12px; border-radius: 8px; background: #fee2e2; color: #991b1b; font-size: 13px; font-weight: bold; display: none; }
+    .confirmacao-box { display: none; margin-top: 16px; padding: 16px; border-radius: 14px; background: #dcfce7; border: 2px solid #16a34a; color: #14532d; }
+    .confirmacao-titulo { font-size: 17px; font-weight: bold; margin-bottom: 8px; color: #064e3b; }
+    .confirmacao-linha { font-size: 13px; margin-bottom: 6px; }
+    .confirmacao-aviso { margin-top: 10px; padding: 10px; border-radius: 10px; background: #f0fdf4; border: 1px solid #86efac; font-size: 13px; font-weight: bold; color: #166534; }
+    .btn-novo { margin-top: 12px; width: 100%; padding: 10px; border: none; border-radius: 8px; background: #064e3b; color: #fff; font-size: 13px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -38,42 +42,57 @@
     <h1>Barraquinha da Morena</h1>
     <p class="sub">Verduras e legumes fresquinhos — escolha os itens e envie seu pedido</p>
 
-    <h2>Produtos Disponíveis</h2>
-    <div id="listaProdutos">Carregando verduras e legumes...</div>
+    <div id="areaFormulario">
+      <h2>Produtos Disponíveis</h2>
+      <div id="listaProdutos">Carregando verduras e legumes...</div>
 
-    <div class="resumo-box">
-      <div style="font-weight:bold;margin-bottom:8px;color:#064e3b;">Resumo do Pedido</div>
-      <div id="resumoItens"><div style="font-size:13px;color:#476657;">Nenhum item selecionado ainda.</div></div>
-      <div class="total-linha">
-        <span>Total</span>
-        <span id="valorTotal">R$ 0,00</span>
+      <div class="resumo-box">
+        <div style="font-weight:bold;margin-bottom:8px;color:#064e3b;">Resumo do Pedido</div>
+        <div id="resumoItens"><div style="font-size:13px;color:#476657;">Nenhum item selecionado ainda.</div></div>
+        <div class="total-linha">
+          <span>Total</span>
+          <span id="valorTotal">R$ 0,00</span>
+        </div>
       </div>
+
+      <label for="clienteNome">Seu nome</label>
+      <input type="text" id="clienteNome" placeholder="Digite seu nome" />
+
+      <label for="clienteEndereco">Endereço de entrega</label>
+      <input type="text" id="clienteEndereco" placeholder="Rua, número e bairro" />
+
+      <label for="formaPagamento">Forma de pagamento</label>
+      <select id="formaPagamento">
+        <option value="Pix">Pix</option>
+        <option value="Cartão de Crédito">Cartão de Crédito</option>
+        <option value="Cartão de Débito">Cartão de Débito</option>
+      </select>
+
+      <div class="pix-box" id="pixBox">
+        <div><strong>Pagamento via Pix:</strong></div>
+        <div>Titular: <strong id="titularPixTexto">Jefferson Vilar</strong></div>
+        <div class="pix-chave" id="chavePixTexto">04856246216</div>
+        <button type="button" class="btn-copiar" id="btnCopiarPix">Copiar Chave Pix</button>
+      </div>
+
+      <button class="btn-enviar" id="btnEnviarPedido">Confirmar e Enviar Pedido</button>
+      <div class="msg-err" id="msgErr"></div>
     </div>
 
-    <label for="clienteNome">Seu nome</label>
-    <input type="text" id="clienteNome" placeholder="Digite seu nome" />
-
-    <label for="clienteEndereco">Endereço de entrega</label>
-    <input type="text" id="clienteEndereco" placeholder="Rua, número e bairro" />
-
-    <label for="formaPagamento">Forma de pagamento</label>
-    <select id="formaPagamento">
-      <option value="Pix">Pix</option>
-      <option value="Cartão de Crédito">Cartão de Crédito</option>
-      <option value="Cartão de Débito">Cartão de Débito</option>
-    </select>
-
-    <div class="pix-box" id="pixBox">
-      <div><strong>Pagamento via Pix:</strong></div>
-      <div>Titular: <strong id="titularPixTexto">Jefferson Vilar</strong></div>
-      <div class="pix-chave" id="chavePixTexto">04856246216</div>
-      <button type="button" class="btn-copiar" id="btnCopiarPix">Copiar Chave Pix</button>
+    <div class="confirmacao-box" id="confirmacaoBox">
+      <div class="confirmacao-titulo">Pedido Confirmado!</div>
+      <div class="confirmacao-linha"><strong>Número do pedido:</strong> <span id="confId">-</span></div>
+      <div class="confirmacao-linha"><strong>Cliente:</strong> <span id="confCliente">-</span></div>
+      <div class="confirmacao-linha"><strong>Endereço de entrega:</strong> <span id="confEndereco">-</span></div>
+      <div class="confirmacao-linha"><strong>Itens:</strong> <span id="confItens">-</span></div>
+      <div class="confirmacao-linha"><strong>Total:</strong> <span id="confTotal">-</span></div>
+      <div class="confirmacao-linha"><strong>Pagamento escolhido:</strong> <span id="confPagamento">-</span></div>
+      <div class="confirmacao-linha"><strong>Status atual:</strong> <span id="confStatus">Pedido feito</span></div>
+      <div class="confirmacao-aviso" id="confAvisoEntrega">
+        Seu pedido foi feito com sucesso e já está registrado para preparo e entrega no seu endereço!
+      </div>
+      <button type="button" class="btn-novo" id="btnFazerOutro">Fazer Novo Pedido</button>
     </div>
-
-    <button class="btn-enviar" id="btnEnviarPedido">Enviar Pedido</button>
-
-    <div class="msg-err" id="msgErr"></div>
-    <div class="msg-ok" id="msgOk"></div>
   </div>
 
   <script>
@@ -94,6 +113,8 @@
 
     let catalogo = {};
     let carrinho = {};
+    let pedidoSalvoKey = null;
+    let monitorStatus = null;
 
     document.getElementById("chavePixTexto").textContent = CHAVE_PIX;
     document.getElementById("titularPixTexto").textContent = TITULAR_PIX;
@@ -226,15 +247,33 @@
       totalEl.textContent = formatarBRL(dados.total);
     }
 
+    async function checarStatusPedido() {
+      if (!pedidoSalvoKey) return;
+      try {
+        const res = await fetch(DB_URL + "/pedidos/" + pedidoSalvoKey + ".json");
+        if (!res.ok) return;
+        const pedido = await res.json();
+        if (!pedido || !pedido.status) return;
+
+        document.getElementById("confStatus").textContent = pedido.status;
+        const avisoEl = document.getElementById("confAvisoEntrega");
+        if (pedido.status === "Entregue") {
+          avisoEl.textContent = "Seu pedido foi entregue! Obrigado por comprar na Barraquinha da Morena.";
+        } else if (pedido.status === "Pago") {
+          avisoEl.textContent = "Pagamento confirmado! Seu pedido está sendo preparado para entrega.";
+        } else {
+          avisoEl.textContent = "Seu pedido foi feito com sucesso e será entregue em breve!";
+        }
+      } catch (e) {}
+    }
+
     document.getElementById("btnEnviarPedido").addEventListener("click", async function () {
       const nome = document.getElementById("clienteNome").value.trim();
       const endereco = document.getElementById("clienteEndereco").value.trim();
       const formaPagamento = document.getElementById("formaPagamento").value;
       const errEl = document.getElementById("msgErr");
-      const okEl = document.getElementById("msgOk");
 
       errEl.style.display = "none";
-      okEl.style.display = "none";
 
       const selecao = obterItensSelecionados();
 
@@ -276,17 +315,47 @@
 
         if (!res.ok) throw new Error("HTTP " + res.status);
 
+        const criado = await res.json();
+        pedidoSalvoKey = criado && criado.name ? criado.name : null;
+
+        document.getElementById("confId").textContent = pedido.id;
+        document.getElementById("confCliente").textContent = pedido.cliente;
+        document.getElementById("confEndereco").textContent = pedido.endereco;
+        document.getElementById("confItens").textContent = pedido.item;
+        document.getElementById("confTotal").textContent = pedido.total;
+        document.getElementById("confPagamento").textContent = pedido.formaPagamento;
+        document.getElementById("confStatus").textContent = pedido.status;
+
+        if (formaPagamento === "Pix") {
+          document.getElementById("confAvisoEntrega").textContent =
+            "Pedido registrado! Conclua o Pix para a chave " + CHAVE_PIX + " (" + TITULAR_PIX + ") — seu pedido será entregue no endereço informado.";
+        } else {
+          document.getElementById("confAvisoEntrega").textContent =
+            "Pedido feito com sucesso via " + formaPagamento + "! Ele já está na fila e será entregue no seu endereço.";
+        }
+
         carrinho = {};
         document.getElementById("clienteNome").value = "";
         document.getElementById("clienteEndereco").value = "";
         renderizarProdutos();
 
-        okEl.textContent = "Pedido " + pedido.id + " enviado (" + formaPagamento + ")! Total: " + pedido.total;
-        okEl.style.display = "block";
+        document.getElementById("areaFormulario").style.display = "none";
+        document.getElementById("confirmacaoBox").style.display = "block";
+
+        if (monitorStatus) clearInterval(monitorStatus);
+        monitorStatus = setInterval(checarStatusPedido, 4000);
       } catch (e) {
         errEl.textContent = "Erro ao enviar pedido para o Firebase. Verifique a conexão e as regras do banco.";
         errEl.style.display = "block";
       }
+    });
+
+    document.getElementById("btnFazerOutro").addEventListener("click", function () {
+      if (monitorStatus) clearInterval(monitorStatus);
+      pedidoSalvoKey = null;
+      document.getElementById("confirmacaoBox").style.display = "none";
+      document.getElementById("areaFormulario").style.display = "block";
+      carregarCatalogo();
     });
 
     carregarCatalogo();
