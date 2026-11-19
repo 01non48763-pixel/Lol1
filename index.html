@@ -23,7 +23,10 @@
     .linha-resumo { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
     .total-linha { display: flex; justify-content: space-between; font-size: 17px; font-weight: bold; color: #064e3b; border-top: 1px solid #cde3d5; padding-top: 8px; margin-top: 6px; }
     label { display: block; font-size: 13px; font-weight: bold; color: #102a1c; margin-top: 12px; margin-bottom: 4px; }
-    input { width: 100%; padding: 10px; border: 1px solid #bfd8c8; border-radius: 8px; font-size: 14px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #bfd8c8; border-radius: 8px; font-size: 14px; background: #fff; }
+    .pix-box { display: none; margin-top: 10px; padding: 12px; border-radius: 10px; background: #ecfdf5; border: 1px solid #a7f3d0; font-size: 13px; color: #065f46; }
+    .pix-chave { margin-top: 6px; padding: 8px; background: #fff; border-radius: 8px; border: 1px solid #cde3d5; font-weight: bold; word-break: break-all; }
+    .btn-copiar { margin-top: 8px; padding: 7px 12px; border: none; border-radius: 8px; background: #047857; color: #fff; font-size: 12px; font-weight: bold; cursor: pointer; }
     .btn-enviar { width: 100%; margin-top: 16px; padding: 12px; border: none; border-radius: 10px; background: #047857; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; }
     .btn-enviar:active { background: #064e3b; }
     .msg-ok { margin-top: 12px; padding: 12px; border-radius: 8px; background: #dcfce7; color: #14532d; font-size: 13px; font-weight: bold; display: none; }
@@ -53,6 +56,20 @@
     <label for="clienteEndereco">Endereço de entrega</label>
     <input type="text" id="clienteEndereco" placeholder="Rua, número e bairro" />
 
+    <label for="formaPagamento">Forma de pagamento</label>
+    <select id="formaPagamento">
+      <option value="Pix">Pix</option>
+      <option value="Cartão de Crédito">Cartão de Crédito</option>
+      <option value="Cartão de Débito">Cartão de Débito</option>
+    </select>
+
+    <div class="pix-box" id="pixBox">
+      <div><strong>Pagamento via Pix:</strong></div>
+      <div>Titular: <strong id="titularPixTexto">Jefferson Vilar</strong></div>
+      <div class="pix-chave" id="chavePixTexto">04856246216</div>
+      <button type="button" class="btn-copiar" id="btnCopiarPix">Copiar Chave Pix</button>
+    </div>
+
     <button class="btn-enviar" id="btnEnviarPedido">Enviar Pedido</button>
 
     <div class="msg-err" id="msgErr"></div>
@@ -61,6 +78,8 @@
 
   <script>
     const DB_URL = "https://barraquinha-49cdc-default-rtdb.firebaseio.com";
+    const CHAVE_PIX = "04856246216";
+    const TITULAR_PIX = "Jefferson Vilar";
 
     const PRODUTOS_PADRAO = {
       tomate_teste: { nome: "Tomate Teste", categoria: "Legume", preco: 1.00 },
@@ -75,6 +94,29 @@
 
     let catalogo = {};
     let carrinho = {};
+
+    document.getElementById("chavePixTexto").textContent = CHAVE_PIX;
+    document.getElementById("titularPixTexto").textContent = TITULAR_PIX;
+
+    function atualizarCampoPix() {
+      const forma = document.getElementById("formaPagamento").value;
+      document.getElementById("pixBox").style.display = forma === "Pix" ? "block" : "none";
+    }
+
+    document.getElementById("formaPagamento").addEventListener("change", atualizarCampoPix);
+    atualizarCampoPix();
+
+    document.getElementById("btnCopiarPix").addEventListener("click", function () {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(CHAVE_PIX).then(function () {
+          alert("Chave Pix copiada!");
+        }).catch(function () {
+          alert("Chave Pix: " + CHAVE_PIX);
+        });
+      } else {
+        alert("Chave Pix: " + CHAVE_PIX);
+      }
+    });
 
     function formatarBRL(valor) {
       return (Number(valor) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -187,6 +229,7 @@
     document.getElementById("btnEnviarPedido").addEventListener("click", async function () {
       const nome = document.getElementById("clienteNome").value.trim();
       const endereco = document.getElementById("clienteEndereco").value.trim();
+      const formaPagamento = document.getElementById("formaPagamento").value;
       const errEl = document.getElementById("msgErr");
       const okEl = document.getElementById("msgOk");
 
@@ -215,6 +258,7 @@
         id: "BM-" + Math.floor(100 + Math.random() * 900),
         cliente: nome,
         endereco: endereco,
+        formaPagamento: formaPagamento,
         item: resumoCurto,
         itens: selecao.itens,
         totalNumero: selecao.total,
@@ -237,7 +281,7 @@
         document.getElementById("clienteEndereco").value = "";
         renderizarProdutos();
 
-        okEl.textContent = "Pedido " + pedido.id + " enviado com sucesso! Total: " + pedido.total;
+        okEl.textContent = "Pedido " + pedido.id + " enviado (" + formaPagamento + ")! Total: " + pedido.total;
         okEl.style.display = "block";
       } catch (e) {
         errEl.textContent = "Erro ao enviar pedido para o Firebase. Verifique a conexão e as regras do banco.";
