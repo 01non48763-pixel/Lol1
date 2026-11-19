@@ -2,389 +2,205 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Barraquinha da Morena - Verduras e Legumes Frescos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barraquinha da Morena - Teste</title>
   <style>
-    :root {
-      --fundo-pagina: #f2f8f4;
-      --fundo-cartao: #ffffff;
-      --fundo-suave: #ebf5ee;
-      --fundo-destaque: #d1fae5;
-      --borda-suave: #cfe5d8;
-      --texto-principal: #102a1c;
-      --texto-secundario: #476657;
-      --verde-escuro: #064e3b;
-      --verde-primario: #047857;
-      --verde-destaque: #059669;
-      --verde-claro: #a7f3d0;
-      --perigo-bg: #fee2e2;
-      --perigo-texto: #991b1b;
-      --sombra-suave: 0 4px 16px rgba(6, 78, 59, 0.06);
-      --sombra-forte: 0 14px 32px rgba(6, 78, 59, 0.16);
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: #eef7f1; color: #12261c; padding: 16px; }
+    .box { max-width: 520px; margin: 0 auto; background: #fff; border: 1px solid #cde3d5; border-radius: 14px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+    h1 { font-size: 20px; color: #065f46; margin-bottom: 4px; }
+    .sub { font-size: 13px; color: #4b6b5b; margin-bottom: 14px; }
+    .card { border: 1px solid #d5e8dc; background: #f7fcf9; border-radius: 12px; padding: 12px; margin-bottom: 14px; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .price { font-size: 18px; font-weight: bold; color: #047857; }
+    .btn { background: #047857; color: #fff; border: none; border-radius: 10px; padding: 10px 14px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .btn:active { background: #064e3b; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-copy { background: #0f766e; color: #fff; border: none; border-radius: 8px; padding: 7px 10px; font-weight: bold; cursor: pointer; font-size: 12px; }
+    label { display: block; font-size: 12px; font-weight: bold; margin-top: 10px; margin-bottom: 4px; }
+    input { width: 100%; padding: 9px 10px; border: 1px solid #bfd8c8; border-radius: 8px; font-size: 14px; }
+    .pix-box { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 12px; margin-top: 12px; font-size: 13px; }
+    .pix-key { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #cde3d5; margin: 8px 0; font-family: monospace; word-break: break-all; }
+    .msg { margin-top: 10px; padding: 10px; border-radius: 8px; background: #dcfce7; color: #14532d; font-size: 13px; font-weight: bold; display: none; }
+    .err { margin-top: 10px; padding: 10px; border-radius: 8px; background: #fee2e2; color: #991b1b; font-size: 13px; font-weight: bold; display: none; }
+    .cart-line { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 14px; }
+    .qty-box { display: flex; align-items: center; gap: 6px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Barraquinha da Morena</h1>
+    <p class="sub">Teste rápido de pedido com Tomate (R$ 1,00), entrega grátis (R$ 0,00) e Pix.</p>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🍅 Tomate Teste</strong>
+          <div style="font-size:12px;color:#4b6b5b;">Unidade promocional de teste</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="price">R$ 1,00</div>
+          <button type="button" class="btn btn-sm" style="margin-top:6px;" onclick="addTomato()">+ Escolher Tomate</button>
+        </div>
+      </div>
+
+      <div id="cartArea" style="margin-top:12px;border-top:1px dashed #cde3d5;padding-top:10px;">
+        <div style="font-size:13px;color:#4b6b5b;">Nenhum tomate selecionado ainda. Clique em <strong>+ Escolher Tomate</strong>.</div>
+      </div>
+    </div>
+
+    <label for="nome">Seu nome</label>
+    <input type="text" id="nome" placeholder="Digite o nome de quem está testando" />
+
+    <label for="endereco">Endereço de entrega</label>
+    <input type="text" id="endereco" placeholder="Rua, número e bairro" />
+
+    <div class="pix-box">
+      <div><strong>Pagamento via Pix</strong></div>
+      <div>Titular: <strong>Jefferson Vilar</strong></div>
+      <div class="pix-key">
+        <span id="pixKeyText">04856246216</span>
+        <button type="button" class="btn-copy" onclick="copyPix()">Copiar Pix</button>
+      </div>
+      <div id="pixCopyCode" style="font-size:11px;color:#374151;word-break:break-all;"></div>
+    </div>
+
+    <button type="button" class="btn" style="width:100%;margin-top:14px;" onclick="finishTest()">Confirmar Pedido de Teste</button>
+
+    <div class="err" id="errBox"></div>
+    <div class="msg" id="okBox"></div>
+  </div>
+
+  <script>
+    var qty = 0;
+    var unitPrice = 1.00;
+
+    function fmt(v) {
+      return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
+    function addTomato() {
+      qty += 1;
+      renderCart();
+      updatePixCode();
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--fundo-pagina);
-      color: var(--texto-principal);
-      line-height: 1.4;
-      padding-bottom: 96px;
+    function changeQty(delta) {
+      qty = Math.max(0, qty + delta);
+      renderCart();
+      updatePixCode();
     }
 
-    button, input, select, textarea {
-      font-family: inherit;
+    function renderCart() {
+      var area = document.getElementById('cartArea');
+      if (qty === 0) {
+        area.innerHTML = '<div style="font-size:13px;color:#4b6b5b;">Nenhum tomate selecionado ainda. Clique em <strong>+ Escolher Tomate</strong>.</div>';
+        return;
+      }
+      var total = qty * unitPrice;
+      area.innerHTML =
+        '<div class="cart-line">' +
+          '<span><strong>' + qty + 'x</strong> Tomate Teste (' + fmt(unitPrice) + ' cada)</span>' +
+          '<div class="qty-box">' +
+            '<button type="button" class="btn btn-sm" onclick="changeQty(-1)">-</button>' +
+            '<strong>' + qty + '</strong>' +
+            '<button type="button" class="btn btn-sm" onclick="changeQty(1)">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cart-line" style="margin-top:10px;font-weight:bold;color:#065f46;">' +
+          '<span>Entrega: R$ 0,00</span>' +
+          '<span>Total: ' + fmt(total) + '</span>' +
+        '</div>';
     }
 
-    button {
-      cursor: pointer;
-      border: none;
-      background: none;
+    function crc16(str) {
+      var crc = 0xFFFF;
+      for (var i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (var j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021;
+          else crc <<= 1;
+          crc &= 0xFFFF;
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
     }
 
-    .hidden {
-      display: none !important;
+    function emv(id, val) {
+      var s = String(val);
+      return id + String(s.length).padStart(2, '0') + s;
     }
 
-    /* TOPO DO APP */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-primario) 100%);
-      color: #ffffff;
-      padding: 14px 16px 16px;
-      box-shadow: 0 4px 18px rgba(6, 78, 59, 0.18);
+    function buildPix(amount) {
+      var val = (Number(amount) > 0 ? Number(amount) : 1.00).toFixed(2);
+      var acc = emv('00', 'br.gov.bcb.pix') + emv('01', '04856246216');
+      var base =
+        emv('00', '01') +
+        emv('26', acc) +
+        emv('52', '0000') +
+        emv('53', '986') +
+        emv('54', val) +
+        emv('58', 'BR') +
+        emv('59', 'JEFFERSON VILAR') +
+        emv('60', 'BRASIL') +
+        emv('62', emv('05', 'TESTETOMATE')) +
+        '6304';
+      return base + crc16(base);
     }
 
-    .header-top {
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+    function updatePixCode() {
+      var amount = qty > 0 ? qty * unitPrice : 1.00;
+      var code = buildPix(amount);
+      document.getElementById('pixCopyCode').textContent = 'Pix Copia e Cola (' + fmt(amount) + '): ' + code;
+      return code;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
+    function copyPix() {
+      var code = updatePixCode();
+      var textToCopy = '04856246216';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).catch(function(){});
+      }
+      var ok = document.getElementById('okBox');
+      ok.style.display = 'block';
+      document.getElementById('errBox').style.display = 'none';
+      ok.innerHTML = 'Chave Pix <strong>04856246216</strong> pronta!<br><span style="font-size:11px;font-weight:normal;word-break:break-all;">Código Pix: ' + code + '</span>';
     }
 
-    .brand-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
-      background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
+    function finishTest() {
+      var err = document.getElementById('errBox');
+      var ok = document.getElementById('okBox');
+      err.style.display = 'none';
+      ok.style.display = 'none';
+
+      var nome = document.getElementById('nome').value.trim();
+      var endereco = document.getElementById('endereco').value.trim();
+
+      if (qty === 0) {
+        err.textContent = 'Clique em "+ Escolher Tomate" antes de confirmar.';
+        err.style.display = 'block';
+        return;
+      }
+      if (!nome || !endereco) {
+        err.textContent = 'Preencha o nome e o endereço para concluir o teste.';
+        err.style.display = 'block';
+        return;
+      }
+
+      var total = qty * unitPrice;
+      var code = buildPix(total);
+      ok.style.display = 'block';
+      ok.innerHTML =
+        'Pedido de teste pronto! Cliente: ' + nome + ' | Total: ' + fmt(total) + ' (Entrega R$ 0,00).<br>' +
+        'Pix para Jefferson Vilar (chave 04856246216):<br>' +
+        '<span style="font-size:11px;font-weight:normal;word-break:break-all;">' + code + '</span>';
     }
 
-    .brand-text h1 {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .brand-text p {
-      font-size: 12px;
-      color: #d1fae5;
-      margin-top: 1px;
-    }
-
-    .cart-top-btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: #ffffff;
-      color: var(--verde-escuro);
-      font-weight: 700;
-      font-size: 13px;
-      padding: 9px 13px;
-      border-radius: 999px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-      flex-shrink: 0;
-    }
-
-    .cart-badge {
-      background: var(--verde-destaque);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 5px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .search-wrap {
-      max-width: 960px;
-      margin: 12px auto 0;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.96);
-      color: var(--texto-principal);
-      border: none;
-      border-radius: 12px;
-      padding: 11px 38px 11px 14px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .search-clear {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--texto-secundario);
-      font-size: 16px;
-      padding: 4px 6px;
-    }
-
-    /* CONTEÚDO PRINCIPAL */
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 14px 16px 24px;
-    }
-
-    .info-strip {
-      background: var(--fundo-cartao);
-      border: 1px solid var(--borda-suave);
-      border-radius: 14px;
-      padding: 11px 14px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 14px;
-      box-shadow: var(--sombra-suave);
-      font-size: 13px;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--fundo-destaque);
-      color: var(--verde-escuro);
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--verde-destaque);
-    }
-
-    .delivery-info {
-      color: var(--texto-secundario);
-      font-weight: 600;
-    }
-
-    /* CATEGORIAS */
-    .categories-bar {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 14px;
-      scrollbar-width: none;
-    }
-
-    .categories-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .cat-btn {
-      white-space: nowrap;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-      background: var(--fundo-cartao);
-      color: var(--texto-secundario);
-      border: 1px solid var(--borda-suave);
-      transition: all 0.15s ease;
-    }
-
-    .cat-btn.active {
-      background: var(--verde-primario);
-      color: #ffffff;
-      border-color: var(--verde-primario);
-      box-shadow: 0 4px 10px rgba(4, 120, 87, 0.22);
-    }
-
-    /* GRADE DE PRODUTOS */
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 14px;
-    }
-
-    .product-card {
-      background: var(--fundo-cartao);
-      border: 1px solid var(--borda-suave);
-      border-radius: 16px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-      box-shadow: var(--sombra-suave);
-    }
-
-    .product-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .product-emoji {
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      background: var(--fundo-suave);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      flex-shrink: 0;
-    }
-
-    .product-meta {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .product-cat-tag {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--verde-primario);
-      background: var(--fundo-suave);
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-bottom: 4px;
-    }
-
-    .product-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--texto-principal);
-      margin-bottom: 3px;
-    }
-
-    .product-desc {
-      font-size: 12.5px;
-      color: var(--texto-secundario);
-    }
-
-    /* SELETOR DE PESO */
-    .weight-selector {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      background: var(--fundo-suave);
-      padding: 4px;
-      border-radius: 10px;
-    }
-
-    .weight-opt {
-      padding: 6px 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--texto-secundario);
-      text-align: center;
-    }
-
-    .weight-opt.active {
-      background: #ffffff;
-      color: var(--verde-escuro);
-      box-shadow: 0 2px 6px rgba(6, 78, 59, 0.12);
-    }
-
-    .product-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--borda-suave);
-    }
-
-    .price-box {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .price-value {
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--verde-escuro);
-    }
-
-    .price-unit {
-      font-size: 11.5px;
-      color: var(--texto-secundario);
-      font-weight: 600;
-    }
-
-    .add-btn {
-      background: var(--verde-primario);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 13px;
-      padding: 9px 14px;
-      border-radius: 11px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s ease;
-    }
-
-    .add-btn:active {
-      background: var(--verde-escuro);
-    }
-
-    .empty-state {
-      background: var(--fundo-cartao);
-      border: 1px dashed var(--borda-suave);
-      border-radius: 16px;
-      padding: 32px 18px;
-      text-align: center;
-      color: var(--texto-secundario);
-    }
-
-    /* BARRA FLUTUANTE DA CESTA */
+    updatePixCode();
+  </script>
+</body>
+</html>
+RRA FLUTUANTE DA CESTA */
     .floating-cart {
       position: fixed;
       left: 12px;
