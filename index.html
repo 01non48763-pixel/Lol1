@@ -3,209 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barraquinha da Morena - Teste do Cliente</title>
+  <title>Barraquinha da Morena - Teste</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    body { background: #eef7f1; color: #102a1c; padding: 16px; min-height: 100vh; }
+    .app { max-width: 500px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 20px; color: #064e3b; margin-bottom: 4px; }
+    p { font-size: 13px; color: #476657; margin-bottom: 16px; }
+    .card { background: #f9fdfb; border: 1px solid #cde3d5; border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+    .row { display: flex; justify-content: space-between; align-items: center; }
+    .price { font-size: 18px; font-weight: bold; color: #047857; }
+    .btn { background: #047857; color: #fff; border: none; border-radius: 8px; padding: 10px 14px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; margin-top: 10px; }
+    .btn:active { background: #064e3b; }
+    label { display: block; font-size: 12px; font-weight: bold; color: #102a1c; margin-top: 12px; margin-bottom: 4px; }
+    input { width: 100%; padding: 10px; border: 1px solid #bfd8c8; border-radius: 8px; font-size: 14px; margin-bottom: 8px; }
+    .msg { margin-top: 12px; padding: 12px; border-radius: 8px; background: #dcfce7; color: #14532d; font-size: 13px; font-weight: bold; display: none; }
+    .err { margin-top: 12px; padding: 12px; border-radius: 8px; background: #fee2e2; color: #991b1b; font-size: 13px; font-weight: bold; display: none; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Barraquinha da Morena</h1>
+    <p>Aplicativo de teste</p>
 
-    body {
-      background: #eef7f1;
-      color: #102a1c;
-      padding: 16px;
-      padding-bottom: 40px;
-    }
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🍅 Tomate Teste</strong>
+          <div style="font-size: 12px; color: #476657;">Unidade de teste</div>
+        </div>
+        <div class="price">R$ 1,00</div>
+      </div>
+    </div>
 
-    .app {
-      max-width: 540px;
-      margin: 0 auto;
-      background: #ffffff;
-      border: 1px solid #cde3d5;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(6, 78, 59, 0.08);
-    }
+    <label for="name">Seu nome</label>
+    <input type="text" id="name" placeholder="Digite seu nome" />
 
-    .header {
-      background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
-      color: #ffffff;
-      padding: 18px;
-    }
+    <label for="address">Endereço</label>
+    <input type="text" id="address" placeholder="Digite seu endereço" />
 
-    .header h1 {
-      font-size: 20px;
-      font-weight: 800;
-    }
+    <button class="btn" onclick="enviarPedido()">Confirmar Pedido</button>
 
-    .header p {
-      font-size: 13px;
-      color: #d1fae5;
-      margin-top: 4px;
-    }
+    <div id="err" class="err"></div>
+    <div id="msg" class="msg"></div>
+  </div>
 
-    .content {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+  <script>
+    const FIREBASE_URL = 'https://barraquinha-49cdc-default-rtdb.firebaseio.com';
 
-    .pill-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      background: #f2f8f4;
-      border: 1px solid #d5e8dc;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #065f46;
-    }
+    async function enviarPedido() {
+      const name = document.getElementById('name').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const err = document.getElementById('err');
+      const msg = document.getElementById('msg');
 
-    .product-card {
-      border: 1px solid #cde3d5;
-      background: #f9fdfb;
-      border-radius: 14px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+      err.style.display = 'none';
+      msg.style.display = 'none';
 
-    .product-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
+      if (!name || !address) {
+        err.textContent = 'Preencha o nome e o endereço.';
+        err.style.display = 'block';
+        return;
+      }
 
-    .product-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: #102a1c;
-    }
+      const pedido = {
+        id: 'BM-' + Math.floor(100 + Math.random() * 900),
+        cliente: name,
+        endereco: address,
+        item: 'Tomate Teste',
+        total: 'R$ 1,00',
+        status: 'Pendente',
+        data: new Date().toLocaleString('pt-BR')
+      };
 
-    .product-sub {
-      font-size: 12.5px;
-      color: #476657;
-      margin-top: 2px;
-    }
+      try {
+        const res = await fetch(FIREBASE_URL + '/pedidos.json', {
+          method: 'POST',
+          body: JSON.stringify(pedido)
+        });
 
-    .price {
-      font-size: 18px;
-      font-weight: 800;
-      color: #047857;
-      white-space: nowrap;
+        if (res.ok) {
+          msg.textContent = 'Pedido enviado com sucesso!';
+          msg.style.display = 'block';
+          document.getElementById('name').value = '';
+          document.getElementById('address').value = '';
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        err.textContent = 'Erro ao enviar. Verifique a conexão ou as regras do Firebase.';
+        err.style.display = 'block';
+      }
     }
-
-    .btn {
-      background: #047857;
-      color: #ffffff;
-      border: none;
-      border-radius: 11px;
-      padding: 11px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .btn:active {
-      background: #064e3b;
-    }
-
-    .btn-sm {
-      padding: 7px 11px;
-      font-size: 12.5px;
-      border-radius: 9px;
-    }
-
-    .btn-copy {
-      background: #0f766e;
-      color: #ffffff;
-      border: none;
-      border-radius: 9px;
-      padding: 8px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .cart-box {
-      border-top: 1px dashed #cde3d5;
-      padding-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      font-size: 13.5px;
-    }
-
-    .qty-controls {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .total-line {
-      font-size: 16px;
-      font-weight: 800;
-      color: #064e3b;
-      padding-top: 6px;
-      border-top: 1px solid #d5e8dc;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #064e3b;
-      margin-bottom: 4px;
-    }
-
-    label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #102a1c;
-      margin-top: 8px;
-      margin-bottom: 4px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #bfd8c8;
-      border-radius: 10px;
-      font-size: 14px;
-      background: #ffffff;
-      color: #102a1c;
-    }
-
-    .pix-box {
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .pix-key-row {
+  </script>
+</body>
+</html>
+ {
       display: flex;
       justify-content: space-between;
       align-items: center;
